@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="906.0" prefWidth="1076.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="application.MainController">
+   <children>
+      <TableView fx:id="tableview" layoutX="243.0" layoutY="141.0" prefHeight="675.0" prefWidth="793.0">
+        <columns>
+          <TableColumn fx:id="step" prefWidth="154.0" text="Step" />
+          <TableColumn fx:id="object" prefWidth="187.0" text="Object" />
+            <TableColumn fx:id="value" prefWidth="136.0" text="Value" />
+            <TableColumn fx:id="comment" prefWidth="310.0" text="Comment" />
+        </columns>
+      </TableView>
+      <MenuBar layoutX="9.0" layoutY="9.0" prefHeight="34.0" prefWidth="1058.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ComboBox layoutX="254.0" layoutY="103.0" prefHeight="24.0" prefWidth="112.0" promptText="Browser" />
+      <ImageView fitHeight="34.0" fitWidth="42.0" layoutX="496.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true" />
+      <Button layoutX="640.0" layoutY="100.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="61.0" text="RUN" />
+      <TextField layoutX="384.0" layoutY="100.0" prefHeight="31.0" prefWidth="112.0" />
+      <Button layoutX="892.0" layoutY="97.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="104.0" text="View Report" />
+   </children>
+</AnchorPane>
