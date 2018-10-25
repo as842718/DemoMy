@@ -4,13 +4,13 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class ActionClass {
 	
-	private SimpleStringProperty UserAction;
+	public SimpleStringProperty UserAction;
 	
-	private SimpleStringProperty Locators;
+	public SimpleStringProperty Locators;
 
-	private SimpleStringProperty value;
+	public SimpleStringProperty value;
 	
-	private SimpleStringProperty Comment;
+	public SimpleStringProperty Comment;
 
 	public ActionClass(String userAction, String locators, String value, String comment) {
 		super();
@@ -20,6 +20,12 @@ public class ActionClass {
 		this.Comment = new  SimpleStringProperty(comment);
 	}
 	
+
+
+	public ActionClass() {
+	
+	}
+
 
 
 	public String getUserAction() {
