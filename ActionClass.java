@@ -46,8 +46,8 @@ public class ActionClass {
 
 
 
-	public void setLocators(SimpleStringProperty locators) {
-		this.Locators = locators;
+	public void setLocators(String locators) {
+		this.Locators = new SimpleStringProperty(locators);
 	}
 
 
@@ -58,8 +58,8 @@ public class ActionClass {
 
 
 
-	public void setValue(SimpleStringProperty value) {
-		this.value = value;
+	public void setValue(String value) {
+		this.value = new SimpleStringProperty(value);
 	}
 
 
@@ -70,8 +70,8 @@ public class ActionClass {
 
 
 
-	public void setComment(SimpleStringProperty comment) {
-		Comment = comment;
+	public void setComment(String comment) {
+		Comment = new SimpleStringProperty(comment);
 	}
 
 
