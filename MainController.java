@@ -1,253 +1,330 @@
 package application;
 
+import java.awt.Button;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.Action;
+import javax.swing.tree.TreeCellEditor;
+
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.cell.ChoiceBoxTreeTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTreeTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 
 public class MainController implements Initializable {
+
+	@FXML
+	public ComboBox<String> combobox;
+
+	@FXML
+	public Label lablename;
+
+	@FXML
+	public ComboBox<String> comboboxLang;
+
+	@FXML
+	public ListView<String> listview;
+
+	@FXML
+	public TreeView<String> ViewTree;
+
+	final MyNumber mynum = new MyNumber();
+
+	@FXML
+	private ProgressBar pi;
+
+	@FXML
+	private ProgressIndicator pb;
 	
+	@FXML
+	public TextField searchText;
 	
 	@FXML
-	public TableView<ActionClass> tableview;
-	@FXML
-	public TableColumn<ActionClass, String> step;
-	@FXML
-	private TableColumn<ActionClass, String> object;
-	@FXML
-	private TableColumn<ActionClass, String> value;
-	@FXML
-	private TableColumn<ActionClass, String> comment;
-	@FXML
-	public ComboBox<String > comboboxBrowser;
-	@FXML
-	public Label browserlabel;
-	@FXML
-	public ImageView imageView;
-	@FXML
-	public ImageView addImage,removeItem,play;
-	@FXML
-	public TreeView<String>ViewTree;
-	@FXML
-	public TextField filter;
+	public Button show;
 	
+	/*@FXML
+	private TableView<Student> table;
+	@FXML
+	private TableColumn<Student,Integer>age;
+	@FXML
+	private TableColumn<Student, String>name;
+	@FXML
+	private  TableColumn<Student, String> sex;*/
+	@FXML
+	private ImageView chrome;
+
+	@FXML
+	public TreeTableView<Student> treetable;
+	@FXML
+	private TreeTableColumn<Student,Number>age;
+	@FXML
+	private TreeTableColumn<Student, String>name;
+	@FXML
+	private  TreeTableColumn<Student, String> sex;
+
 	
-	public ObservableList<ActionClass> Actionlist = FXCollections.observableArrayList(
-			
-			new ActionClass("loadURL"," ","https://google.com"," "),
-			new ActionClass("EnterText","searchfield","Googi","text field"),
-			new ActionClass("click","searchBox"," ","click event"),
-			new ActionClass("Close Browser"," ",""," ")
-				);
+	TreeItem<Student>perl = new TreeItem<Student>(new Student("asd",1,"m"));
+	TreeItem<Student>per2 = new TreeItem<Student>(new Student("asd",2,"m"));
+	TreeItem<Student>per3 = new TreeItem<Student>(new Student("asd",3,"m"));
+	TreeItem<Student>per4 = new TreeItem<Student>(new Student(" ",3," "));	
 	
-	
-	public ObservableList<ActionClass> newAciont = FXCollections.observableArrayList(
-			
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " ")
-			
-			
-			);
-	
-	public ObservableList<String> browserlist = FXCollections.observableArrayList("CHROME","FIREFOX","IE");
+	TreeItem<Student>treeroot = new TreeItem<Student>(new Student("Name",0,"Email"));	
 	
 	Image icone = new Image(getClass().getResourceAsStream("/img/4.png"));
 	Image testcase_icon = new Image(getClass().getResourceAsStream("/img/edit-icon.png"));
+
+	// creating list
+	ObservableList<String> list = FXCollections.observableArrayList("CHROME", "FIREFOX", "IE", "SAFARI");
 	
-	TreeItem<String> root;
+
+public ObservableList<Student> studentlist = FXCollections.observableArrayList(
 	
-	
-	public void setTableView() {
-		step.setCellValueFactory(new PropertyValueFactory<ActionClass,String>("UserAction"));
-		object.setCellValueFactory(new PropertyValueFactory<ActionClass,String>("Locators"));
-		value.setCellValueFactory(new PropertyValueFactory<ActionClass,String>("value"));
-		comment.setCellValueFactory(new PropertyValueFactory<ActionClass,String>("comment"));
-		
-		// editable
-		step.setCellFactory(TextFieldTableCell.forTableColumn());
-		object.setCellFactory(TextFieldTableCell.forTableColumn());
-		value.setCellFactory(TextFieldTableCell.forTableColumn());
-		comment.setCellFactory(TextFieldTableCell.forTableColumn());
-		
-		tableview.setItems(Actionlist);	
-		tableview.setEditable(true);	
-		
-		// Edit Update
-		step.setOnEditCommit((CellEditEvent<ActionClass, String> t) ->
-		t.getRowValue().setUserAction(t.getNewValue()));
-		
-		value.setOnEditCommit((CellEditEvent<ActionClass, String> t) ->
-		t.getRowValue().setValue(t.getNewValue()));
-		
-		object.setOnEditCommit((CellEditEvent<ActionClass, String> t) ->
-		t.getRowValue().setLocators(t.getNewValue()));
-		
-		comment.setOnEditCommit((CellEditEvent<ActionClass, String> t) ->
-		t.getRowValue().setComment(t.getNewValue()));
-		
-		
-	}
-		/*
-		 public void startEdi1t() {
-		        super.startEdit();
-		        if (textField == null) {
-		            createTextField();
-		        }
-		        setGraphic(textField);
-		        setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		    }*/
-	
+	new Student("Ankur",1,"male"),new Student("Anku",2,"male")	
+	,new Student("Ankr",1,"Female")	
+);
+
+
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-			
-		setTableView();
+
+	
 		
-		comboboxBrowser.getItems().addAll(browserlist);
+		//DropDown
+		combobox.setItems(list);
+		listview.setItems(list);
+		listview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
-		addImage.setImage(new Image("/img/document-add-icon.png"));
-		removeItem.setImage(new Image("/img/document-remove-icon.png"));
-		play.setImage(new Image("/img/Play-1-Hot-icon.png"));
 		
 		// TreeView Folder
-			root = new TreeItem<>("Folder",new javafx.scene.image.ImageView(icone));
-		TreeItem<String> node_1 = new TreeItem<>("TestCase",new javafx.scene.image.ImageView(icone));
-		TreeItem<String> node_2= new TreeItem<String>("ObjectRepo",new javafx.scene.image.ImageView(icone));
-
-		root.getChildren().addAll(node_1,node_2);
+		TreeItem<String> root = new TreeItem<>("TestSuite",new javafx.scene.image.ImageView(icone));
+		TreeItem<String> root2 = new TreeItem<>("Test11Suite",new javafx.scene.image.ImageView(icone));
 		
+		TreeItem<String> node_1 = new TreeItem<>("TestCase_1",new javafx.scene.image.ImageView(testcase_icon));
+		TreeItem<String> node_2= new TreeItem<String>("TestCase_2",new javafx.scene.image.ImageView(testcase_icon));
+		TreeItem<String> node_3= new TreeItem<String>("TestCase_3",new javafx.scene.image.ImageView(testcase_icon));
 		
-		node_1.getChildren().addAll(new TreeItem<String>("LogIn",new javafx.scene.image.ImageView(testcase_icon)), new TreeItem<>("VerifyUser",new javafx.scene.image.ImageView(testcase_icon)));
-		ViewTree.setEditable(true);
-		ViewTree.setCellFactory(TextFieldTreeCell.forTreeView());
+		root.getChildren().addAll(node_1,node_2,node_3);
+		node_1.getChildren().addAll(new TreeItem<String>("TestStep_1"), new TreeItem<>("TestStep_2"));
 		ViewTree.setRoot(root);
-		ViewTree.setShowRoot(false);
-	
+		ViewTree.setRoot(root2);
 		
-		ViewTree.getSelectionModel().selectedItemProperty().addListener( new ChangeListener() {
-			
-	        @Override
-	        public void changed(ObservableValue observable, Object oldValue,
-	                Object newValue) {
-	        	
-	            TreeItem<String> selectedItem = (TreeItem<String>) newValue;
-	            System.out.println("Selected Text : " + selectedItem.getValue());
-	            
-	            if(selectedItem.getValue()!="TestCase") {
-	            	 FXCollections.copy(Actionlist, newAciont);
-	 	            tableview.refresh();   
-	            }   
-	        }
+		
+		// Progress bar
+		mynum.setNumber(0);
+		mynum.numberProperty().addListener(new ChangeListener<Object>() {
 
-	      });
+			@Override
+			public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
+			pb.progressProperty().bind(mynum.numberProperty());
+			pi.progressProperty().bind(mynum.numberProperty());	
+			}
+		});
 	
+
+		treeroot.getChildren().setAll(perl,per2,per3,per4);
+		
+		name.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Student,String>, ObservableValue<String>>() {
+
+			@Override
+			public ObservableValue<String> call(CellDataFeatures<Student, String> param) {
+				// TODO Auto-generated method stub
+				return param.getValue().getValue().getName();
+			}
+		});
+
+		sex.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Student,String>, ObservableValue<String>>() {
+
+			@Override
+			public ObservableValue<String> call(CellDataFeatures<Student, String> param) {
+				// TODO Auto-generated method stub
+				return param.getValue().getValue().getSex();
+			}
+		});
+		
+		age.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Student,Number>, ObservableValue<Number>>() {
+
+			@Override
+			public ObservableValue<Number> call(CellDataFeatures<Student, Number> param) {
+				
+				return param.getValue().getValue().getAge();
+			}
+		});
+		
+		ObservableList<String> lust = FXCollections.observableArrayList();
+		lust.add("As");
+		lust.add("asd");
+		lust.add("sd");
+		
+		name.setCellFactory(ComboBoxTreeTableCell.forTreeTableColumn(lust));
+		
+		
+		//age.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		sex.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+		
+		name.setOnEditCommit( new EventHandler<TreeTableColumn.CellEditEvent<Student, String>>(){
+
+			@Override
+			public void handle(javafx.scene.control.TreeTableColumn.CellEditEvent<Student, String> event) {
+				TreeItem<Student> cuurrent = treetable.getTreeItem(event.getTreeTablePosition().getRow());
+				
+				cuurrent.getValue().setName(event.getNewValue());
+			}
+
+		});
+		treetable.setEditable(true);
+		treetable.setShowRoot(false);
+		
+		treetable.setRoot(treeroot);
+		
+		/*searchText.textProperty().addListener(new ChangeListener<String>() {
+			public <T> void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				tv.setPredicate(new Predicate<T>() {
+
+					@Override
+					public boolean test(T t) {
+						// TODO Auto-generated method stub
+						return false;
+					}
+				})
+			
+				
+			}
+		}*/
+		
+	//	age.setCellValueFactory(TreeTableColumn.CellDataFeatures<Student,String>para->para.);
+		
+		
 	
 	}
-	
-	
-	
-	
-	
-	
 		
-/*	@FXML
-	private void fillTreeView() {
-	    // The tree needs a root, and it needs to be a DocumentObject
-	    // so we create an empty folder and hide it
-	    TreeItem<String> treeRoot = new TreeItem<>("Test");
+public void MouseClick(MouseEvent event) {
 
-	    ObservableList<TreeItem<String>> firstLevel = FXCollections.observableArrayList();
+		if (event.getClickCount() == 2) {
+			TreeItem<String> items = ViewTree.getSelectionModel().getSelectedItem();
+			System.out.println(items.getValue());	
+		}
+	}
 
-	    for (Folder folder : logic.getFolderList()) {
-	        TreeItem<String> folderNode = new TreeItem<>(folder);
-
-	        for (FileReference file : folder.getFileList()) {
-	            TreeItem<String> fileNode = new TreeItem<>(file);
-	            folderNode.getChildren().add(fileNode);
-	        }
-
-	        firstLevel.add(folderNode);
-	    }
-
-	    treeRoot.setExpanded(true);
-
-
-	    FilteredList<TreeItem<String>> filteredList = new FilteredList<>(firstLevel, item -> true);
-
-	    filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> {
-	        String filter = textField.getText();
-	        if (filter.isEmpty()) return item -> true ;
-	        return item -> item.getValue().getName().startsWith(filter) ; // your implementation may vary...
-	    }, textField.textProperty());
-
-	    Bindings.bindContent(treeRoot.getChildren(), filteredList);
-
-	    treeNav.setRoot(treeRoot);
-	    treeNav.setShowRoot(false);
-	}	
-	*/
-@FXML
-public void ChangeStep(TableColumn.CellEditEvent<ActionClass, String>test) {
+public void changeName(ActionEvent event) {
 	
-	ActionClass product= tableview.getSelectionModel().getSelectedItem();
+		lablename.setText(comboboxLang.getValue());
+	}
+
+public void AddLangToUser(ActionEvent event) {
 	
-	product.setUserAction(test.getNewValue().toString());
+if(combobox.getValue().equals("CHROME")){
+		comboboxLang.getItems().clear();
+	comboboxLang.getItems().addAll("Chrome70","Chrome69","Chrome68");
+	chrome.setImage(new Image(getClass().getResourceAsStream("/img/chrome.png")));
+}
+else if (combobox.getValue().equals("FIREFOX")) {
+		comboboxLang.getItems().clear();
+		comboboxLang.getItems().addAll("FF56","FF40","FF41");
+		chrome.setImage(new Image(getClass().getResourceAsStream("/img/ff.png")));
+	}
+else if (combobox.getValue().equals("IE")) {
+		comboboxLang.getItems().clear();
+		comboboxLang.getItems().addAll("IE11","IE10","IE12");
+		chrome.setImage(new Image(getClass().getResourceAsStream("/img/IE.png")));
+	}
+else if (combobox.getValue().equals("SAFARI")) {
+	comboboxLang.getItems().clear();
+	comboboxLang.getItems().addAll("SF12","SF2","SF3");
+
+	chrome.setImage(new Image(getClass().getResourceAsStream("/img/SF.png")));
 	
-	System.out.println(test.getNewValue().toString()+"test1");
-	
+}
+else {comboboxLang.getItems().clear();}
 }
 
 
-public void RunEvent(MouseEvent event) {
+public void addListView(ActionEvent event) {
+	listview.setItems(list);	
+}
+
+public void BtnClickInc(ActionEvent event) {	
+	mynum.setNumber(mynum.getNumber()+.1);
+}
+
+public void BtnClickDec(ActionEvent event) {
+	mynum.setNumber(mynum.getNumber()-.1);
+}
+
+public void closeApp(ActionEvent event) {
+	Platform.exit();
+	System.exit(0);
+}
+
+public void OpenApp(ActionEvent event) {
 	
-	ActionClass action = new ActionClass();
+	FileChooser fc  = new FileChooser();
+	fc.getExtensionFilters().add(
+		new ExtensionFilter("Text File", "*.txt")
+			);
+	File selectFile= fc.showOpenDialog(null);
 	
+	if(selectFile!=null) {
+		System.out.println("File Found");
+	}else {
+		
+		System.out.println("File not found");
+	}
+}
+
+
+public void clickshow(ActionEvent event) {
+	
+
 	List <List<String>> arrlist = new ArrayList<>();
 	
 	// Getting Browser value
-	String Browser =comboboxBrowser.getValue();
 	
-	if(Browser!=null) {
-	System.out.println(Browser);
-	
-	for(int i=0;i<tableview.getItems().size();i++) {	
-		action=tableview.getItems().get(i);
+	for(int i=0;i<treetable.getItems().size();i++) {	
+		student =treetable.getItems().get(i);
 		arrlist.add(new ArrayList<>());
-		arrlist.get(i).add(action.UserAction.get());
+		arrlist.get(i).add(Student);
 		arrlist.get(i).add(action.Locators.get());
 		arrlist.get(i).add(action.value.get());
 		arrlist.get(i).add(action.Comment.get());
@@ -264,144 +341,18 @@ public void RunEvent(MouseEvent event) {
 		
 	}
 	
-	Thread t1 = new Thread(new UserAction ());
-	t1.start();
+}
+/*
+public void chnagename(TableColumn.CellEditEvent<Student, String>test) {
 	
-	}else
-		showAlertWithoutHeaderText();
+	Student product= table.getSelectionModel().getSelectedItem();
+	
+	product.setName(test.getNewValue().toString());
+	
+	System.out.println(test.getNewValue().toString());
 	
 }
 
-	@FXML
-	public void changeBrowser(ActionEvent event) {
-	
-		if (comboboxBrowser.getValue().equalsIgnoreCase("chrome")) {
-			//browserlabel.setText(comboboxBrowser.getValue());
-			imageView.setImage(new Image("/img/Chrome-icon.png"));
-		
-		} else if (comboboxBrowser.getValue().equalsIgnoreCase("firefox")) {
-			
-			imageView.setImage(new Image("/img/firefox-icon.png"));
+*/
 
-		} else if (comboboxBrowser.getValue().equalsIgnoreCase("ie")) {
-
-			//browserlabel.setText(comboboxBrowser.getValue());
-			imageView.setImage(new Image("/img/IE-icon.png"));
-		}
-
-	}
-
-@FXML
-public void addItems(MouseEvent event) {
-		addNewitems("TestCase");
-	}
-
-	public void addNewitems(String value) {
-		
-		if (value == null || value.trim().equals(""))
-		{
-			System.out.println("Item cannot be empty.");
-			return;
-		}
-
-		TreeItem<String> parent = ViewTree.getSelectionModel().getSelectedItem();
-		
-	//	String getvalue = ViewTree.getSelectionModel().getSelectedItem().getValue();
-
-		if(parent==null) {
-			System.out.println("Select node to add this ites");
-			return;
-			
-		}
-		 TreeItem<String> newItem = new TreeItem<String>(value,new javafx.scene.image.ImageView(testcase_icon));
-
-		 parent.getChildren().add(newItem);
-		 if (!parent.isExpanded())
-			     {  parent.setExpanded(true);}	}
-
-	
-	public void removeItems() {
-		 removeItem();
-	}
-	private void removeItem()
-	{
-		TreeItem<String> item = ViewTree.getSelectionModel().getSelectedItem();
-
-		if (item == null)
-		{
-			System.out.println("Select a node to remove.");
-			return;
-		}
-
-		TreeItem<String> parent = item.getParent();
-		if (parent == null )
-		{
-			System.out.println("Cannot remove the root node.");
-		}
-		else
-		{
-			parent.getChildren().remove(item);
-		}
-	}
-	
-
-	
-	public void closeApp(ActionEvent event) {
-		Platform.exit();
-		System.exit(0);
-	}
-
-	
-@FXML
-public void OpenApp(ActionEvent event) {
-	
-	FileChooser fc  = new FileChooser();
-	fc.getExtensionFilters().add(
-		new ExtensionFilter("Text File", "*.txt")
-			);
-	File selectFile= fc.showOpenDialog(null);
-	
-	if(selectFile!=null) {
-		System.out.println("File Found");
-	}else {
-		
-		System.out.println("File not found");
-	}
-}
-	
-
-public void addnewSuiteFolder() {
-	TreeItem<String> newSuite = new TreeItem<>("TestSuite",new javafx.scene.image.ImageView(icone));
-	root.getChildren().add(newSuite);
-	ViewTree.setEditable(true);
-	ViewTree.setCellFactory(TextFieldTreeCell.forTreeView());	
-}
-
-public void addnewTestDatafolder() {
-	TreeItem<String> newSuite = new TreeItem<>("TestData",new javafx.scene.image.ImageView(icone));
-	root.getChildren().add(newSuite);
-	ViewTree.setEditable(true);
-	ViewTree.setCellFactory(TextFieldTreeCell.forTreeView());	
-}
-
-public void addnewTestCasefolder() {
-	TreeItem<String> newTestcase = new TreeItem<>("TestCase",new javafx.scene.image.ImageView(icone));
-	root.getChildren().add(newTestcase);
-	ViewTree.setEditable(true);
-	ViewTree.setCellFactory(TextFieldTreeCell.forTreeView());	
-}
-
-public void showAlertWithoutHeaderText() {
-    Alert alert = new Alert(AlertType.INFORMATION);
-    alert.setTitle("Test Connection");
-
-    // Header Text: null
-    alert.setHeaderText(null);
-    alert.setContentText("Please select browser type");
-
-    alert.showAndWait();
-}
-
-
-	
 }
