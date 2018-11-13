@@ -51,7 +51,7 @@
       <ComboBox fx:id="comboboxBrowser" layoutX="286.0" layoutY="100.0" onAction="#changeBrowser" prefHeight="31.0" prefWidth="149.0" promptText="Browser" />
      
       <ImageView fx:id="imageView" fitHeight="34.0" fitWidth="45.0" layoutX="455.0" layoutY="99.0" onMouseClicked="#RunEvent" pickOnBounds="true" preserveRatio="true" />
-      <Button layoutX="892.0" layoutY="97.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="104.0" text="View Report" />
+      <Button layoutX="892.0" layoutY="97.0" mnemonicParsing="false" onAction="#resultview" prefHeight="34.0" prefWidth="104.0" text="View Report" />
       <TreeView fx:id="ViewTree" layoutX="17.0" layoutY="173.0" prefHeight="642.0" prefWidth="225.0" />
       <TextField fx:id="filter" layoutX="17.0" layoutY="141.0" prefHeight="31.0" prefWidth="225.0" promptText="Enter Search Text" />
       <ImageView fx:id="addImage" fitHeight="34.0" fitWidth="45.0" layoutX="107.0" layoutY="101.0" onMouseClicked="#addItems" pickOnBounds="true" preserveRatio="true" />
