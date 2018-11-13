@@ -1,12 +1,11 @@
 package application;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import com.gru.uioperation.ActionRunner;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +14,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
@@ -26,7 +28,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -35,6 +36,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 public class MainController implements Initializable {
 	
@@ -42,7 +44,7 @@ public class MainController implements Initializable {
 	@FXML
 	public TableView<ActionClass> tableview;
 	@FXML
-	public TableColumn<ActionClass,String> step;
+	public TableColumn<ActionClass, String> step;
 	@FXML
 	private TableColumn<ActionClass, String> object;
 	@FXML
@@ -61,39 +63,38 @@ public class MainController implements Initializable {
 	public TreeView<String>ViewTree;
 	@FXML
 	public TextField filter;
+	@FXML
+	public TableView<ObjectReop> tableObj;
+	@FXML
+	public TableColumn<ObjectReop, String> objectName;
+	
+	@FXML
+	public TableColumn<ObjectReop, String> locator;
 	
 	
 	public ObservableList<ActionClass> Actionlist = FXCollections.observableArrayList(
 			
-			new ActionClass("loadURL"," ","https://google.com"," ")
-			,new ActionClass("Enter Text","//*[@name='q']","Googi","text field"),
-			new ActionClass("Click","//*[@name='q']"," ","click event"),
-			new ActionClass("Close Browser"," ",""," "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " ")
+			new ActionClass("loadURL"," ","https://google.com"," "),
+			new ActionClass("EnterText","searchfield","Googi","text field"),
+			new ActionClass("click","searchBox"," ","click event"),
+			new ActionClass("Close Browser"," ",""," ")
 				);
 	
 	
 	public ObservableList<ActionClass> newAciont = FXCollections.observableArrayList(
 			
 			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
-			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " "),
 			new ActionClass(" ", " ", " ", " "),new ActionClass(" ", " ", " ", " ")
 			
 			
 			);
 	
 	public ObservableList<String> browserlist = FXCollections.observableArrayList("CHROME","FIREFOX","IE");
-	public ObservableList<String> keywordList = FXCollections.observableArrayList("Click","Enter Text","loadURL","Close Browser");
 	
 	Image icone = new Image(getClass().getResourceAsStream("/img/4.png"));
 	Image testcase_icon = new Image(getClass().getResourceAsStream("/img/edit-icon.png"));
 	
 	TreeItem<String> root;
-	
 	
 	
 	public void setTableView() {
@@ -103,14 +104,12 @@ public class MainController implements Initializable {
 		comment.setCellValueFactory(new PropertyValueFactory<ActionClass,String>("comment"));
 		
 		// editable
-		step.setCellFactory(ComboBoxTableCell.forTableColumn(keywordList));
+		step.setCellFactory(TextFieldTableCell.forTableColumn());
 		object.setCellFactory(TextFieldTableCell.forTableColumn());
 		value.setCellFactory(TextFieldTableCell.forTableColumn());
 		comment.setCellFactory(TextFieldTableCell.forTableColumn());
 		
-		step.setEditable(true);
-		
-		tableview.setItems(newAciont);	
+		tableview.setItems(Actionlist);	
 		tableview.setEditable(true);	
 		
 		// Edit Update
@@ -127,6 +126,51 @@ public class MainController implements Initializable {
 		t.getRowValue().setComment(t.getNewValue()));
 		
 		
+		
+		
+		/*
+		
+		object.setCellFactory(new Callback<ActionClass,String> {
+	           
+			public TableCell call(TableColumn String) {
+	               TableCell cell = new TableCell() {
+	               // The updateItem method is what is called when setting the cell's text.  You can customize formatting here
+	               @Override 
+	               protected void updateItem(Object item, boolean empty) {
+	                  // calling super here is very important - don't skip this!
+	                  super.updateItem(item, empty);
+	                  if(item != null) {
+	                      setText(item.toString());
+	                  }
+	               }
+	           };
+	           
+	           ContextMenu menu = new ContextMenu();
+	           
+	           
+	           MenuItem item = new MenuItem("View Person");
+	           item.setOnAction(new EventHandler() {
+	               public void handle(ActionEvent t) {
+	                   Person person = tableView.getSelectionModel().getSelectedItem();
+	                   System.out.println("person" + person.getId().intValue());
+	               }
+	           });
+	           menu.getItems().addAll(item);
+	           
+	           cell.setOnClick(new EventHandler() {
+	               public void handle(MouseEvent t) {
+	                   if(t.getClickCount() == 2) {
+	                       Person person = (Person) tableView.getItems().get(((TableCell)t.getSource()).getIndex());
+	                       System.out.println("person" + person.getId().intValue());
+	                   }
+	               }
+	           };
+	           
+	           return cell;
+	       }
+	    });
+		
+		*/
 	}
 		/*
 		 public void startEdi1t() {
@@ -151,51 +195,36 @@ public class MainController implements Initializable {
 		play.setImage(new Image("/img/Play-1-Hot-icon.png"));
 		
 		// TreeView Folder
-		root = new TreeItem<>("Folder",new javafx.scene.image.ImageView(icone));
+			root = new TreeItem<>("Folder",new javafx.scene.image.ImageView(icone));
 		TreeItem<String> node_1 = new TreeItem<>("TestCase",new javafx.scene.image.ImageView(icone));
 		TreeItem<String> node_2= new TreeItem<String>("ObjectRepo",new javafx.scene.image.ImageView(icone));
 
 		root.getChildren().addAll(node_1,node_2);
 		
 		
-		node_1.getChildren().addAll(new TreeItem<String>("VerifySearchField",new javafx.scene.image.ImageView(testcase_icon)));
+		node_1.getChildren().addAll(new TreeItem<String>("LogIn",new javafx.scene.image.ImageView(testcase_icon)), new TreeItem<>("VerifyUser",new javafx.scene.image.ImageView(testcase_icon)));
 		ViewTree.setEditable(true);
 		ViewTree.setCellFactory(TextFieldTreeCell.forTreeView());
 		ViewTree.setRoot(root);
-		ViewTree.setShowRoot(false);		
-		ViewTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-			public void cleanCase() {
-				
-				tableview.setItems(newAciont);
-				tableview.refresh(); 
-			}
-			  @Override
+		ViewTree.setShowRoot(false);
+	
+		
+		ViewTree.getSelectionModel().selectedItemProperty().addListener( new ChangeListener() {
+			
+	        @Override
 	        public void changed(ObservableValue observable, Object oldValue,
 	                Object newValue) {
-	         
-				  
+	        	
 	            TreeItem<String> selectedItem = (TreeItem<String>) newValue;
 	            System.out.println("Selected Text : " + selectedItem.getValue());
-	           
-	            if(selectedItem.getValue()=="NewCase")
-	            	cleanCase();
-	            List list = new ArrayList<String>();
-	            if(selectedItem.getValue()!="TestCase" && selectedItem.getValue()!="ObjectRepo" 
-	            		&& selectedItem.getValue()!="NewCase" && selectedItem.getValue()!="TestData" && selectedItem.getValue()!="TestSuite" ) {
-	            	tableview.setItems(Actionlist);
+	            
+	            if(selectedItem.getValue()!="TestCase") {
+	            	 FXCollections.copy(Actionlist, newAciont);
 	 	            tableview.refresh();   
-	            }   else {
-	            	
-	            	tableview.setItems(newAciont);
-					tableview.refresh();
-	            }
+	            }   
 	        }
 
 	      });
-		
-	
-		
-//ViewTree.getSelectionModel().selectedItemProperty().
 	
 	
 	}
@@ -275,18 +304,18 @@ public void RunEvent(MouseEvent event) {
 		arrlist.get(i).add(action.Comment.get());
 	}
 	
-	//System.out.println(arrlist);
+	System.out.println(arrlist);
 	
 	
-	/*
+	
 	for(int i=0;i<arrlist.size();i++) {
 		for(int j=0;j<arrlist.get(i).size();j++) {			
 			System.out.print(arrlist.get(i).get(j)+"--->"+"\n");
 		}
 		
-	}*/
+	}
 	
-	Thread t1 = new Thread(new ActionRunner(arrlist,Browser));
+	Thread t1 = new Thread(new UserAction ());
 	t1.start();
 	
 	}else
@@ -315,7 +344,7 @@ public void RunEvent(MouseEvent event) {
 
 @FXML
 public void addItems(MouseEvent event) {
-		addNewitems("NewCase");
+		addNewitems("TestCase");
 	}
 
 	public void addNewitems(String value) {
@@ -424,6 +453,22 @@ public void showAlertWithoutHeaderText() {
     alert.showAndWait();
 }
 
+public void resultview() throws IOException {
+	
+Stage primaryStage = new Stage();
+	FXMLLoader loader  = new FXMLLoader(getClass().getResource("/Result.fxml"));
+	Parent root = (Parent)loader.load();
+	
+	//screen
+	
+	Scene scene = new Scene(root);
+	scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+	
+	primaryStage.setTitle("Report");
+	primaryStage.setScene(scene);
+	primaryStage.show();
 
+	
+}
 	
 }
